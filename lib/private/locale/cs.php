@@ -27,15 +27,14 @@
         $gLocale[ "Gladiator" ]                = "Gladiator";
         $gLocale[ "Lancer" ]                   = "Lancer";
         $gLocale[ "Marauder" ]                 = "Marauder";
-        $gLocale[ "Monk" ]                     = "Monk";
-        $gLocale[ "Paladin" ]                  = "Paladin";
+        $gLocale[ "Monk_FF14" ]                = "Monk";
+        $gLocale[ "Paladin_FF14" ]             = "Paladin";
         $gLocale[ "Pugilist" ]                 = "Pugilist";
         $gLocale[ "Scholar" ]                  = "Scholar";
         $gLocale[ "Summoner" ]                 = "Summoner";
         $gLocale[ "Thaumaturge" ]              = "Thaumaturge";
-        $gLocale[ "Warrior" ]                  = "Warrior";
+        $gLocale[ "Warrior_FF14" ]             = "Warrior";
         $gLocale[ "Whitemage" ]                = "Whitemage";
-        $gLocale[ "Random" ]                   = "Náhodný";
         
         // Roles
         $gLocale[ "Tank" ]                     = "Tank";
@@ -229,6 +228,7 @@
         $gLocale[ "HelpPage" ]                 = "Odkaz na nápovědu";
         $gLocale[ "Game" ]                     = "Hra";
         $gLocale[ "Theme" ]                    = "Vzhled";
+        $gLocale[ "ApiPrivate" ]               = null;
         $gLocale[ "RaidSetupStyle" ]           = "Attendance style";        
         $gLocale[ "RaidModeManual" ]           = "Setup by raidlead";
         $gLocale[ "RaidModeOverbook" ]         = "By raidlead with overbooking";
@@ -276,7 +276,7 @@
         $gLocale[ "PDONotFound" ]              = "PDO není nakonfigurováno s PHP";
         $gLocale[ "PDOMySQLModule" ]           = "PDO MySQL driver";
         $gLocale[ "PDOMySQLNotFound" ]         = "PDO MySQL driver not found";
-        $gLocale[ "PHPRequirements" ]          = "The raidplaner needs a PHP 5.2 installation configured with the mcrypt and PDO extensions.";
+        $gLocale[ "PHPRequirements" ]          = "The raidplaner needs a PHP 5.3 installation configured with PDO extensions.";
         
         // Database setup
         $gLocale[ "ConfigureDatabase" ]        = "Prosím nakonfigurujte databázi, do které bude Raidplaner ukládat data.";
@@ -305,6 +305,7 @@
         $gLocale[ "AllowGroupSync" ]           = "Synchronize groups of external users";
         $gLocale[ "AllowPublicMode" ]          = "Registrovat nové uživatele jako členy (není doporučeno)";
         $gLocale[ "UseClearText" ]             = "Submit cleartext password (not recommended)";
+
         
         // Install/Update
         $gLocale[ "SetupComplete" ]            = "Nastavení je hotovo";
@@ -329,24 +330,37 @@
         $gLocale[ "FailedGameconfig" ]         = "Soubor gameconfig.php nemohl být převeden na nový formát.";
         $gLocale[ "RemoveAndLaunch" ]          = "Smazat složku setup a začít";
         $gLocale[ "FailedRemoveSetup" ]        = "Složka setup nemohla být smazána.";
+
         
         // Repair
-        $gLocale[ "Repair" ]                   = "Repaire database inconsistencies";
-        $gLocale[ "GameconfigProblems" ]       = "By changing the lib/gameconfig.php inconsistent database entries can be created (e.g. characters with invalid roles).";
-        $gLocale[ "RepairTheseProblems" ]      = "This script fixes these problems as good as possible.";
-        $gLocale[ "RepairDone" ]               = "Repair done.";
-        $gLocale[ "BrokenDatabase" ]           = "Database seems to be broken";
+        $gLocale[ "Repair" ]                   = "Opravit nekonzistence v databázi";
+        $gLocale[ "RepairDone" ]               = "Oprava je hotova.";
+        $gLocale[ "BrokenDatabase" ]           = "Zdá se, že databáze je rozbitá.";
         $gLocale[ "EnsureValidDatabase" ]      = "Ensure a valid database";        
-        $gLocale[ "ItemsRepaired" ]            = "Items repaired";
-        $gLocale[ "ItemsToResolve" ]           = "Items need to be resolved manually";
-        $gLocale[ "InvalidCharacters" ]        = "Invalid characters";
-        $gLocale[ "InvalidAttendances" ]       = "Invalid attendances";
-        $gLocale[ "Delete" ]                   = "Delete";
-        $gLocale[ "Resolve" ]                  = "Resolve";
-        $gLocale[ "StrayRoles" ]               = "Invalid roles";
-        $gLocale[ "StrayCharacters" ]          = "Deleted characters";
-        $gLocale[ "StrayUsers" ]               = "Deleted users";
-        $gLocale[ "StrayBindings" ]            = "Invalid users";
+        $gLocale[ "ItemsRepaired" ]            = "Položky opraveny";
+        $gLocale[ "ItemsToResolve" ]           = "Položky, které musí být opraveny ručně";
+        $gLocale[ "InvalidCharacters" ]        = "Neplatné postavy";
+        $gLocale[ "InvalidAttendances" ]       = "Neplatné účasti";
+        $gLocale[ "Delete" ]                   = "Smazat";
+        $gLocale[ "Resolve" ]                  = "Vyřešit";
+        $gLocale[ "StrayRoles" ]               = "Neplatné role";
+        $gLocale[ "StrayCharacters" ]          = "Smazané postavy";
+        $gLocale[ "StrayUsers" ]               = "Smazaní uživatelé";
+        $gLocale[ "StrayBindings" ]            = "Neplatní uživatelé";
+        $gLocale[ "RepairCharacters" ]         = "Opravit neplatné postany";
+        $gLocale[ "TransferGameconfig" ]       = "Převést gameconfig.php znovu (Raidplaner 1.0.x)";
+        $gLocale[ "MergeGames" ]               = "Sloučit dvě hry";
+        $gLocale[ "SourceGame" ]               = "Zdroj (Bude změněn)";
+        $gLocale[ "TargetGame" ]               = "Cíl";
+        $gLocale[ "ChooseRepairs" ]            = "Choose one or multiple repairs to be executed.";
+        $gLocale[ "Fixing" ]                   = "Opravuji";
+        $gLocale[ "StrayChars" ]               = "Orphaned characters";
+        $gLocale[ "StrayAttends" ]             = "Orphaned attends";
+        $gLocale[ "InvalidCharacters" ]        = "Neplatné postavy";
+        $gLocale[ "SameGame" ]                 = "Hry se shodují";   
+        $gLocale[ "Merged" ]                   = "Converted:"; 
+        $gLocale[ "Locations" ]                = "Locations"; 
+        $gLocale[ "Characters" ]               = "Postavy"; 
         
         // Plugin setup
         $gLocale[ "LoadGroups" ]               = "Load groups using these settings";
@@ -445,7 +459,7 @@
         $gLocale[ "drupal_CookieEx" ]           = "Drupal base URL";
         
         // Wordpress
-        $gLocale[ "wp_Binding" ]                = "Wordpress 3.x";
+         $gLocale[ "wp_Binding" ]                = "Wordpress 3.x";
         $gLocale[ "wp_ConfigFile" ]             = "Wordpress konfigurační soubor";
         $gLocale[ "wp_Database" ]               = "Wordpress databáze";
         $gLocale[ "wp_DatabaseEmpty" ]          = "Wordpress jméno databáze nesmí být prázdné.";
