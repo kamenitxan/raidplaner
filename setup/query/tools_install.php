@@ -1,99 +1,145 @@
 <?php
     require_once(dirname(__FILE__)."/../../lib/private/connector.class.php");
+    require_once(dirname(__FILE__)."/../../lib/private/random.class.php");
+    require_once(dirname(__FILE__)."/column.class.php");
+    require_once(dirname(__FILE__)."/key.class.php");
+    
+    // -------------------------------------------------------------------------
+    
+    $gDatabaseLayout = Array(
+        "Attendance" => Array(
+            new Column("AttendanceId", "int",          10,                                                 Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("CharacterId",  "int",          10,                                                 Array("unsigned", "NOT NULL")),
+            new Column("UserId",       "int",          10,                                                 Array("unsigned", "NOT NULL")),
+            new Column("RaidId",       "int",          10,                                                 Array("unsigned", "NOT NULL")),
+            new Column("LastUpdate",   "timestamp",    null,                                               Array("DEFAULT CURRENT_TIMESTAMP")),
+            new Column("Status",       "enum",         Array('ok','available','unavailable','undecided'),  Array("NOT NULL")),
+            new Column("Role",         "char",         3,                                                  Array("NOT NULL")),
+            new Column("Class",        "char",         3,                                                  Array("NOT NULL")),
+            new Column("Comment",      "text",         null,                                               Array("NOT NULL")),
+            new Key(   "primary",      "AttendanceId"),
+            new Key(   "",             "UserId"),
+            new Key(   "",             "CharacterId"),
+            new Key(   "",             "RaidId"),
+            new Key(   "",             "Status"),
+            new Key(   "",             "UserId,Status"),
+            new Key(   "",             "UserId,CharacterId"),
+
+        ),
+        
+        "Character" => Array(
+            new Column("CharacterId",  "int",      10,                     Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("UserId",       "int",      10,                     Array("unsigned", "NOT NULL")),
+            new Column("Game",         "char",     4,                      Array("NOT NULL")),
+            new Column("Name",         "varchar",  64,                     Array("NOT NULL")),
+            new Column("Mainchar",     "enum",     Array('true','false'),  Array("NOT NULL", "DEFAULT 'false'")),
+            new Column("Class",        "varchar",  128,                    Array("NOT NULL")),
+            new Column("Role1",        "char",     3,                      Array("NOT NULL")),
+            new Column("Role2",        "char",     3,                      Array("NOT NULL")),
+            new Key(   "primary",      "CharacterId"),
+            new Key(   "",             "UserId"),
+            new Key(   "",             "Game"),
+            new Key(   "",             "Game,UserId")
+        ),
+        
+        "Location" => Array(
+            new Column("LocationId",   "int",      10,     Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("Game",         "char",     4,      Array("NOT NULL")),
+            new Column("Name",         "varchar",  128,    Array("NOT NULL")),
+            new Column("Image",        "varchar",  255,    Array("NOT NULL")),
+            new Key(   "primary",      "LocationId"),
+            new Key(   "",             "Game")
+        ),
+        
+        "Raid" => Array(
+            new Column("RaidId",       "int",       10,                                         Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("LocationId",   "int",       10,                                         Array("unsigned", "NOT NULL")),
+            new Column("Stage",        "enum",      Array('open','locked','canceled'),          Array("NOT NULL", "DEFAULT 'open'")),
+            new Column("Size",         "tinyint",   2,                                          Array("unsigned", "NOT NULL")),
+            new Column("Start",        "datetime",  null,                                       Array("NOT NULL")),
+            new Column("End",          "datetime",  null,                                       Array("NOT NULL")),
+            new Column("Mode",         "enum",      Array('manual','overbook','attend','all'),  Array("NOT NULL")),
+            new Column("Description",  "text",      null,                                       Array("NOT NULL")),
+            new Column("SlotRoles",    "varchar",   24,                                         Array("NOT NULL")),
+            new Column("SlotCount",    "varchar",   12,                                         Array("NOT NULL")),
+            new Key(   "primary",      "RaidId"),
+            new Key(   "",             "LocationId"),
+            new Key(   "",             "Start")
+        ),
+        
+        "Session" => Array(
+            new Column("SessionId",    "int",       10,     Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("UserId",       "int",       10,     Array("NOT NULL")),
+            new Column("SessionName",  "char",      40,     Array("NOT NULL")),
+            new Column("IpAddress",    "char",      40,     Array("NOT NULL")),
+            new Column("Expires",      "timestamp", null,   Array("DEFAULT CURRENT_TIMESTAMP")),
+            new Column("Data",         "text",      null,   Array("NOT NULL")),
+            new Key(   "primary",      "SessionId"),
+            new Key(   "unique",       "SessionName"),
+            new Key(   "",             "UserId"),
+        ),
+        
+        "Setting" => Array(
+            new Column("SettingId",    "int",      10,     Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("Name",         "varchar",  64,     Array("NOT NULL")),
+            new Column("IntValue",     "int",      11,     Array("NOT NULL")),
+            new Column("TextValue",    "varchar",  255,    Array("NOT NULL")),
+            new Key(   "primary",      "SettingId"),
+            new Key(   "",             "Name"),
+            new Key(   "unique",       "Name")
+        ),
+        
+        "User" => Array(
+            new Column("UserId",           "int",      10,                                         Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("Group",            "enum",     Array('admin','raidlead','member','none'),  Array("NOT NULL", "DEFAULT 'none'")),
+            new Column("ExternalId",       "int",      10,                                         Array("unsigned", "NOT NULL")),
+            new Column("ExternalBinding",  "char",     10,                                         Array("NOT NULL")),
+            new Column("BindingActive",    "enum",     Array('true','false'),                      Array("NOT NULL", "DEFAULT 'true'")),
+            new Column("Login",            "varchar",  255,                                        Array("NOT NULL")),
+            new Column("Password",         "char",     128,                                        Array("NOT NULL")),
+            new Column("Salt",             "char",     64,                                         Array("NOT NULL")),
+            new Column("OneTimeKey",       "char",     32,                                         Array("NOT NULL")),
+            new Column("Created",          "datetime", null,                                       Array("NOT NULL")),
+            new Key(   "primary",          "UserId"),
+            new Key(   "",                 "ExternalId")
+        ),
+        
+        "UserSetting" => Array(
+            new Column("UserSettingId",    "int",      10,     Array("unsigned", "NOT NULL", "AUTO_INCREMENT")),
+            new Column("UserId",           "int",      10,     Array("unsigned", "NOT NULL")),
+            new Column("Name",             "varchar",  64,     Array("NOT NULL")),
+            new Column("IntValue",         "int",      11,     Array("NOT NULL")),
+            new Column("TextValue",        "varchar",  255,    Array("NOT NULL")),
+            new Key(   "primary",          "UserSettingId"),
+            new Key(   "",                 "UserId"),
+            new Key(   "",                 "Name"),
+            new Key(   "",                 "UserId,Name")
+        )
+    );
+    
+    // ------------------------------------------------------------------------
 
     function InstallDB($Prefix)
     {
+        global $gDatabaseLayout;
+        
         $Out = Out::getInstance();
         $Connector = Connector::getInstance();
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."Attendance` (
-              `AttendanceId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `CharacterId` int(10) unsigned NOT NULL,
-              `UserId` int(11) unsigned NOT NULL,
-              `RaidId` int(10) unsigned NOT NULL,
-              `LastUpdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-              `Status` enum('ok','available','unavailable','undecided') NOT NULL,
-              `Role` char(3) NOT NULL,
-              `Class` char(3) NOT NULL,
-              `Comment` text NOT NULL,
-              PRIMARY KEY (`AttendanceId`),
-              KEY `UserId` (`UserId`),
-              KEY `CharacterId` (`CharacterId`),
-              KEY `RaidId` (`RaidId`)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."Character` (
-              `CharacterId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `UserId` int(10) unsigned NOT NULL,
-              `Game` char(4) NOT NULL,
-              `Name` varchar(64) NOT NULL,
-              `Mainchar` enum('true','false') NOT NULL DEFAULT 'false',
-              `Class` varchar(128) NOT NULL,
-              `Role1` char(3) NOT NULL,
-              `Role2` char(3) NOT NULL,
-              PRIMARY KEY (`CharacterId`),
-              KEY `UserId` (`UserId`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."Location` (
-              `LocationId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `Game` char(4) NOT NULL,
-              `Name` varchar(128) NOT NULL,
-              `Image` varchar(255) NOT NULL,
-              PRIMARY KEY (`LocationId`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."Raid` (
-              `RaidId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `LocationId` int(10) unsigned NOT NULL,
-              `Stage` enum('open','locked','canceled') NOT NULL DEFAULT 'open',
-              `Size` tinyint(2) unsigned NOT NULL,
-              `Start` datetime NOT NULL,
-              `End` datetime NOT NULL,
-              `Mode` enum('manual','overbook','attend','all') NOT NULL,
-              `Description` text NOT NULL,
-              `SlotRoles` varchar(24) NOT NULL,
-              `SlotCount` varchar(12) NOT NULL,
-              PRIMARY KEY (`RaidId`),
-              KEY `LocationId` (`LocationId`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."Setting` (
-              `SettingId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `Name` varchar(64) NOT NULL,
-              `IntValue` int(11) NOT NULL,
-              `TextValue` varchar(255) NOT NULL,
-              PRIMARY KEY (`SettingId`),
-              FULLTEXT KEY `Name` (`Name`),
-              UNIQUE KEY `Unique_Name` (`Name`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."User` (
-              `UserId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `Group` enum('admin','raidlead','member','none') NOT NULL,
-              `ExternalId` int(10) unsigned NOT NULL,
-              `ExternalBinding` char(10) NOT NULL,
-              `BindingActive` enum('true','false') NOT NULL DEFAULT 'true',
-              `Login` varchar(255) NOT NULL,
-              `Password` char(128) NOT NULL,
-              `Salt` char(64) NOT NULL,
-              `OneTimeKey` char(32) NOT NULL,
-              `SessionKey` char(32) NOT NULL,
-              `Created` datetime NOT NULL,
-              PRIMARY KEY (`UserId`),
-              KEY `ExternalId` (`ExternalId`)
-            ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
-
-        $Connector->exec( "CREATE TABLE IF NOT EXISTS `".$Prefix."UserSetting` (
-              `UserSettingId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-              `UserId` int(10) unsigned NOT NULL,
-              `Name` varchar(64) NOT NULL,
-              `IntValue` int(11) NOT NULL,
-              `TextValue` varchar(255) NOT NULL,
-              PRIMARY KEY (`UserSettingId`),
-              KEY `UserId` (`UserId`),
-              FULLTEXT KEY `Name` (`Name`)
-            ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
+                
+        foreach($gDatabaseLayout as $Name => $Rows)
+        {
+            $QueryString = "CREATE TABLE IF NOT EXISTS `".$Prefix.$Name."` (";
+            $FirstRow = true;
+            
+            foreach($Rows as $Row)
+            {
+                $QueryString .= (($FirstRow) ? "" : ",").$Row->CreateText();
+                $FirstRow = false;
+            }
+            
+            $QueryString .= ") ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;";
+            $Connector->exec($QueryString);
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -153,7 +199,13 @@
 
         if ( !in_array("StartOfWeek", $ExistingSettings) )
             $Connector->exec( "INSERT INTO `".$Prefix."Setting` (`Name`, `IntValue`, `TextValue`) VALUES('StartOfWeek', 1, '');" );
-
+            
+        if ( !in_array("ApiPrivate", $ExistingSettings) )
+        {
+            $PrivateToken = dechex(crc32(Random::getBytes(2048))).dechex(crc32(Random::getBytes(2048)));
+            $Connector->exec( "INSERT INTO `".$Prefix."Setting` (`Name`, `IntValue`, `TextValue`) VALUES('ApiPrivate', 0, '".$PrivateToken."');" );
+        }
+        
         if ( !in_array("Version", $ExistingSettings) )
             $Connector->exec( "INSERT INTO `".$Prefix."Setting` (`Name`, `IntValue`, `TextValue`) VALUES('Version', 110, '');" );
         else
@@ -302,7 +354,7 @@
         fwrite($NewGameConfig, "\n\t<roles>\n");
         
         $RoleIdx = 0;
-        while (list($Name, $Loca) = each($gRoles))
+        foreach ($gRoles as $Name => $Loca)
         {
             $RoleId = BuildXCC($Loca, 3);
             $RoleId = MakeUnqiue($RoleId, $Loca, $aRoleIdxToId);
@@ -326,7 +378,7 @@
         fwrite($NewGameConfig, "\n\t<classes>\n");
         
         $RoleIdx = 0;
-        while (list($Name, $ClassDesc) = each($gClasses))
+        foreach ($gClasses as $Name => $ClassDesc)
         {
             if ($Name == "empty") continue;
                 
@@ -367,7 +419,7 @@
         
         fwrite($NewGameConfig, "\n\t<groups>\n");
         
-        while(list($Size, $RoleCount) = each($gGroupSizes))
+        foreach($gGroupSizes as $Size => $RoleCount)
         {
             fwrite($NewGameConfig, "\t\t<group count=\"".$Size."\">\n");
             

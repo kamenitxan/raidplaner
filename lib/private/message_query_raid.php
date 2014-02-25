@@ -1,4 +1,5 @@
 <?php
+
     function msgRaidDetail( $aRequest )
     {
         if (validUser())
@@ -24,7 +25,7 @@
                                               "LEFT JOIN `".RP_TABLE_PREFIX."Character` USING(CharacterId) ".
                                               "WHERE RaidId = :RaidId ORDER BY `".RP_TABLE_PREFIX."Attendance`.AttendanceId");
 
-            $ListRaidQuery->bindValue( ":RaidId", $aRequest["id"], PDO::PARAM_INT );
+            $ListRaidQuery->bindValue( ":RaidId", intval($aRequest["id"]), PDO::PARAM_INT );
             $Data = $ListRaidQuery->fetchFirstOfLoop();
 
             if ($Data != null)
@@ -82,7 +83,7 @@
                                                                  "WHERE UserId = :UserId AND Game = :Game ".
                                                                  "ORDER BY Mainchar, CharacterId ASC" );
 
-                                $CharQuery->bindValue( ":UserId", $Data["UserId"], PDO::PARAM_INT );
+                                $CharQuery->bindValue( ":UserId", intval($Data["UserId"]), PDO::PARAM_INT );
                                 $CharQuery->bindValue( ":Game", $gGame["GameId"], PDO::PARAM_STR );
                                 
                                 $CharData = $CharQuery->fetchFirstOfLoop();
@@ -179,7 +180,7 @@
                                                             "WHERE UserId = :UserId AND Game = :Game ".
                                                             "ORDER BY Mainchar, CharacterId ASC" );
 
-                            $CharQuery->bindValue( ":UserId", $Data["UserId"], PDO::PARAM_INT );
+                            $CharQuery->bindValue( ":UserId", intval($Data["UserId"]), PDO::PARAM_INT );
                             $CharQuery->bindValue( ":Game", $gGame["GameId"], PDO::PARAM_STR );
                             
                             $CharQuery->loop( function($CharData) use (&$AttendeeData)
@@ -219,8 +220,8 @@
                                                         "WHERE UserId = :UserId AND Created < FROM_UNIXTIME(:RaidEnd) AND Game = :Game ".
                                                         "ORDER BY Mainchar, CharacterId ASC" );
 
-                        $CharQuery->bindValue( ":UserId", $User["UserId"], PDO::PARAM_INT );
-                        $CharQuery->bindValue( ":RaidEnd", $EndTimestamp, PDO::PARAM_INT );
+                        $CharQuery->bindValue( ":UserId", intval($User["UserId"]), PDO::PARAM_INT );
+                        $CharQuery->bindValue( ":RaidEnd", intval($EndTimestamp), PDO::PARAM_INT );
                         $CharQuery->bindValue( ":Game", $gGame["GameId"], PDO::PARAM_STR );
                         
                         $UserData = $CharQuery->fetchFirstOfLoop();
@@ -272,6 +273,12 @@
                 });
 
                 $Out->pushValue("attendee", $Attendees);
+                
+                $ExportParameter = Api::normalizeArgsRaid(Array(
+                    "raid"    => intval($aRequest["id"]),
+                    "attends" => true,
+                ));                                
+                $Out->pushValue("token", Api::getPublicToken($ExportParameter));
             }
 
             if ( validRaidlead() )

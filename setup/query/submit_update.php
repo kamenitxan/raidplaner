@@ -9,7 +9,7 @@
         $Connector = Connector::getInstance();
         $Connector->beginTransaction();
 
-        while ( list($Name, $Query) = each($a_Statement) )
+        foreach ( $a_Statement as $Name => $Query )
         {
             echo "<div class=\"update_step\">".$Name;
 
@@ -194,7 +194,7 @@
                 array_push($AffectedUsers, $UserData);
             });
 
-            if ( sizeof($AffectedUsers) > 0 )
+            if ( count($AffectedUsers) > 0 )
             {
 
                 // Update vbulletin users
@@ -220,7 +220,7 @@
                     {
                         $UpdateUser = $Connector->prepare("UPDATE `".RP_TABLE_PREFIX."User` SET Salt = :Salt WHERE UserId = :UserId LIMIT 1");
 
-                        $UpdateUser->bindValue(":UserId", $UserData["UserId"], PDO::PARAM_INT);
+                        $UpdateUser->bindValue(":UserId", intval($UserData["UserId"]), PDO::PARAM_INT);
                         $UpdateUser->bindValue(":Salt", $VbUserSalt[$UserData["ExternalId"]], PDO::PARAM_STR);
                         $UpdateUser->setErrorsAsHTML(true);
 
@@ -254,7 +254,7 @@
                 $UpdateUser = $Connector->prepare("UPDATE `".RP_TABLE_PREFIX."User` SET Password=:Password, BindingActive='false' ".
                                                   "WHERE UserId= :UserId LIMIT 1");
 
-                $UpdateUser->bindValue(":UserId", $UserData["UserId"], PDO::PARAM_INT);
+                $UpdateUser->bindValue(":UserId", intval($UserData["UserId"]), PDO::PARAM_INT);
                 $UpdateUser->bindValue(":Password", hash("sha256", $UserData["Password"].$UserData["Salt"]), PDO::PARAM_STR);
                 $UpdateUser->setErrorsAsHTML(true);
 
@@ -306,6 +306,18 @@
     function upgrade_100()
     {
         echo "<div class=\"update_version\">".L("UpdateFrom")." 1.0.0 ".L("UpdateTo")." 1.1.0";
+        
+        $SessionTableCreate = "CREATE TABLE `".RP_TABLE_PREFIX."Session` (
+            `SessionId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                `UserId` int(10) NOT NULL,
+                `SessionName` char(40) NOT NULL,
+                `IpAddress` char(40) NOT NULL,
+                `Expires` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                `Data` text NOT NULL,
+                PRIMARY KEY (`SessionId`),
+                UNIQUE KEY `SessionName` (`SessionName`),
+                KEY `UserId` (`UserId`)
+        ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;";
 
         $Updates = Array( "Multi class support"   => "ALTER TABLE `".RP_TABLE_PREFIX."Character` CHANGE `Class` `Class` VARCHAR(128) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;",
                           "Class attendance"      => "ALTER TABLE `".RP_TABLE_PREFIX."Attendance` ADD `Class` CHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `Role`;",
@@ -316,7 +328,31 @@
                                                      "ALTER TABLE `".RP_TABLE_PREFIX."Raid` ADD `SlotCount` VARCHAR(12) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL AFTER `SlotRoles`;",
                           "Roles by identifier"   => "ALTER TABLE `".RP_TABLE_PREFIX."Attendance` CHANGE `Role` `Role` CHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;".
                                                      "ALTER TABLE `".RP_TABLE_PREFIX."Character` CHANGE `Role1` `Role1` CHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;".
-                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Character` CHANGE `Role2` `Role2` CHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;"   );
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Character` CHANGE `Role2` `Role2` CHAR(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL;",
+                          "Performance"           => "ALTER TABLE `".RP_TABLE_PREFIX."Raid` ADD INDEX (`Start`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Location` ADD INDEX (`Game`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Character` ADD INDEX (`Game`);",
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Character` ADD INDEX GameUserId (`Game`,`UserId`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Attendance` ADD INDEX (`Status`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Attendance` ADD INDEX UserIdStatus (`UserId`,`Status`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Attendance` ADD INDEX UserIdCharacterId (`UserId`,`CharacterId`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Setting` DROP INDEX Name;".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."Setting` ADD INDEX (`Name`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."UserSetting` DROP INDEX Name;".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."UserSetting` ADD INDEX (`Name`);".
+                                                     "ALTER TABLE `".RP_TABLE_PREFIX."UserSetting` ADD INDEX UserIdName (`UserId`,`Name`);",
+                          "New session handling"  => "ALTER TABLE `".RP_TABLE_PREFIX."User` DROP SessionKey;".
+                                                     "CREATE TABLE `".RP_TABLE_PREFIX."Session` (
+                                                        `SessionId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+                                                        `UserId` int(10) NOT NULL,
+                                                        `SessionName` char(40) NOT NULL,
+                                                        `IpAddress` char(40) NOT NULL,
+                                                        `Expires` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                        `Data` text NOT NULL,
+                                                        PRIMARY KEY (`SessionId`),
+                                                        UNIQUE KEY `SessionName` (`SessionName`),
+                                                        KEY `UserId` (`UserId`)
+                                                     ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;" );
         
         // Timezone fix
         
@@ -422,7 +458,7 @@
         echo "<div class=\"update_step\">New Role ids";
         
         $RoleQueryString = "";
-        for ($i=0; $i<sizeof($RoleIdxToId); ++$i)
+        for ($i=0; $i<count($RoleIdxToId); ++$i)
         {
             $RoleQueryString .= "UPDATE `".RP_TABLE_PREFIX."Character` SET Role1 = :Role".$i." WHERE Role1 = ".$i.";";
             $RoleQueryString .= "UPDATE `".RP_TABLE_PREFIX."Character` SET Role2 = :Role".$i." WHERE Role2 = ".$i.";";
@@ -432,7 +468,7 @@
         $RolesQuery = $Connector->prepare($RoleQueryString);
         $RolesQuery->setErrorsAsHTML(true);
         
-        for ($i=0; $i<sizeof($RoleIdxToId); ++$i)
+        for ($i=0; $i<count($RoleIdxToId); ++$i)
         {
             $RolesQuery->bindValue(":Role".$i, $RoleIdxToId[$i], PDO::PARAM_STR);
         }
@@ -447,11 +483,10 @@
         echo "<div class=\"update_step\">New class ids";
         
         $ClassQueryString = "";
-        while (list($Name, $ClassId) = each($ClassNameToId))
+        foreach ($ClassNameToId as $Name => $ClassId)
         {
             $ClassQueryString .= "UPDATE `".RP_TABLE_PREFIX."Character` SET Class = '".$ClassId."' WHERE Class = '".$Name."';";
         }
-        reset($ClassNameToId);
         
         $ClassQuery = $Connector->prepare($ClassQueryString);
         $ClassQuery->setErrorsAsHTML(true);
@@ -476,7 +511,7 @@
             $UpdateRaidQuery = $Connector->prepare("UPDATE `".RP_TABLE_PREFIX."Raid` SET SlotRoles = :Roles, SlotCount = :Count WHERE RaidId = :RaidId LIMIT 1");
             
             $SlotCount = Array();
-            for ($i=0; $i<sizeof($RoleIdxToId) && $i<5; ++$i)
+            for ($i=0; $i<count($RoleIdxToId) && $i<5; ++$i)
             {
                 array_push($SlotCount, intval($aRaid["SlotsRole".($i+1)]));
             }
@@ -484,7 +519,7 @@
             $UpdateRaidQuery->setErrorsAsHTML(true);
             $UpdateRaidQuery->bindValue(":Roles", $SlotRoles, PDO::PARAM_STR);
             $UpdateRaidQuery->bindValue(":Count", implode(":",$SlotCount), PDO::PARAM_STR);
-            $UpdateRaidQuery->bindValue(":RaidId", $aRaid["RaidId"], PDO::PARAM_INT);
+            $UpdateRaidQuery->bindValue(":RaidId", intval($aRaid["RaidId"]), PDO::PARAM_INT);
             
             if (!$UpdateRaidQuery->execute())
                 ++$NumErrors;

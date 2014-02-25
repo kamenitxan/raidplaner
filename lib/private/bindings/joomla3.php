@@ -246,7 +246,7 @@
                                              "LEFT JOIN `".JML3_TABLE_PREFIX."user_usergroup_map` ON id=user_id ".
                                              "WHERE id = :UserId");
 
-            $UserQuery->BindValue( ":UserId", $aUserId, PDO::PARAM_INT );
+            $UserQuery->BindValue( ":UserId", intval($aUserId), PDO::PARAM_INT );
             $UserData = null;
             $Groups = array();
 
@@ -298,8 +298,8 @@
         {
             switch($aMethod)
             {
-            case self::$HashMethod_MD5s:
-                return md5($aPassword.$aSalt);
+            case self::$HashMethodMD5s:
+                return md5($aPassword.$aSalt).":".$aSalt;
             
             default:
                 return crypt($aPassword,$aSalt);

@@ -1,5 +1,4 @@
 function checkConfigForm( a_OnSuccess, a_Parameter )
-
 {
     if ( $("#password").val().length == 0 )
     {
@@ -67,7 +66,8 @@ function ShowDBErrors(a_XMLData)
             Message += "\n" + $(this).text();
         });
 
-        return confirm(Message);
+        alert(Message);
+        return false;
     }
 
     return true;

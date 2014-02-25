@@ -1,6 +1,8 @@
 <?php
     require_once(dirname(__FILE__)."/connector.class.php");
     require_once(dirname(__FILE__)."/settings.class.php");
+    require_once(dirname(__FILE__)."/session.class.php");
+    require_once(dirname(__FILE__)."/random.class.php");
     
     $gVersion = 110.0;
 
@@ -13,6 +15,48 @@
     {
         if (file_exists($aFile))
             include_once($aFile);
+    }
+    
+    // ---------------------------------------------------------------
+    
+    function getParam($aName, $aDefault)
+    {
+        return getParamFrom($_REQUEST, $aName, $aDefault);
+    }
+    
+    // ---------------------------------------------------------------
+    
+    function getParamFrom($aParameters, $aName, $aDefault)
+    {
+        $Value = (($aParameters != null) && isset($aParameters[$aName])) ? $aParameters[$aName] : $aDefault;
+        switch(strtolower($Value))
+        {
+        case "true":
+            return true;
+            
+        case "false":
+            return false;
+            
+        default:
+            return (is_numeric($Value))
+                ? intval($Value)
+                : $Value;
+        }
+    }
+
+    // ---------------------------------------------------------------
+    
+    function getBaseURL()
+    {
+        $Protocol = (strpos($_SERVER["SERVER_PROTOCOL"], "https") !== false) ? "https://" : "http://";
+        $Host = $_SERVER["SERVER_NAME"].(($_SERVER["SERVER_PORT"] == 80) ? "" : ":".$_SERVER["SERVER_PORT"]);
+        
+        $LibIdx = strpos($_SERVER["REQUEST_URI"], "lib/");
+        $Path   = ($LibIdx !== false) 
+            ? substr($_SERVER["REQUEST_URI"], 0, $LibIdx)
+            : substr($_SERVER["REQUEST_URI"], 0, strrpos($_SERVER["REQUEST_URI"],"/")+1);
+        
+        return $Protocol.$Host.$Path;      
     }
 
     // ---------------------------------------------------------------
@@ -45,9 +89,9 @@
         $gSite["StartOfWeek"] = 1;
         $gSite["GameConfig"]  = "wow";
 
-        foreach($Settings->Property as $Data)
+        foreach($Settings->getProperties() as $Name => $Data)
         {
-            switch( $Data["Name"] )
+            switch( $Name )
             {
             case "Site":
                 $gSite["BannerLink"] = $Data["TextValue"];
@@ -90,7 +134,7 @@
                         
                         if (isset($Theme->random))
                         {
-                            $Index = rand(0, sizeof($Theme->random));
+                            $Index = rand(0, count($Theme->random));
                             $Overwrite = $Theme->random[$Index];
                         
                             $gSite["Banner"]     = (isset($Overwrite->banner))   ? (string)$Overwrite->banner   : $gSite["Banner"];
@@ -122,18 +166,9 @@
 
     // ---------------------------------------------------------------
 
-    function loadGameSettings()
+    function loadGame($aConfigFileName)
     {
-        global $gSite;
-        global $gGame;
-        
-        if ($gGame != null)
-            return; // ### return, already initialized ###
-            
-        loadSiteSettings();
-        $Out = Out::getInstance();
-        
-        $gGame = Array(
+        $Game = Array(
             "GameId"        => "none",
             "Family"        => "wow",
             "ClassMode"     => "single",
@@ -144,7 +179,7 @@
             "Groups"        => Array()
         );
         
-        $ConfigFile = realpath(dirname(__FILE__)."/../../themes/games/".$gSite["GameConfig"].".xml");
+        $ConfigFile = realpath(dirname(__FILE__)."/../../themes/games/".$aConfigFileName.".xml");
         
         if ( !file_exists($ConfigFile) )
         {
@@ -158,15 +193,15 @@
                 
                 // General
                 
-                $gGame["GameId"] = strtolower($Config->id);
-                $gGame["Family"] = strtolower($Config->family);
-                $gGame["ClassMode"] = strtolower($Config->classmode);
+                $Game["GameId"] = strtolower($Config->id);
+                $Game["Family"] = strtolower($Config->family);
+                $Game["ClassMode"] = strtolower($Config->classmode);
                 
-                if (strlen($gGame["GameId"]) > 4)
-                    throw new Exception("Game ids must be at least 1 and can be at most 4 characters long. ".$gGame["GameId"]." does not match this rule.");
+                if (strlen($Game["GameId"]) > 4)
+                    throw new Exception("Game ids must be at least 1 and can be at most 4 characters long. ".$Game["GameId"]." does not match this rule.");
                 
-                if (($gGame["ClassMode"] != "single") && 
-                    ($gGame["ClassMode"] != "multi"))
+                if (($Game["ClassMode"] != "single") && 
+                    ($Game["ClassMode"] != "multi"))
                 {
                     throw new Exception("Classmode must either be single or multi.");
                 }
@@ -178,7 +213,7 @@
                     if (strlen(strval($Role["id"])) != 3)
                         throw new Exception("Role ids must be exactly 3 characters long. ".strval($Role["id"])." does not match this rule.");
                         
-                    $gGame["Roles"][strval($Role["id"])] = Array(
+                    $Game["Roles"][strval($Role["id"])] = Array(
                         "id"    => strval($Role["id"]),
                         "name"  => strval($Role["loca"]),
                         "style" => strval($Role["style"])
@@ -202,7 +237,7 @@
                     
                     foreach($Class->role as $Role)
                     {
-                        if (!isset($gGame["Roles"][strval($Role["id"])]))
+                        if (!isset($Game["Roles"][strval($Role["id"])]))
                             throw new Exception("Unknown role ".$Role["id"]." used in class ".$Class["id"].".");
                         
                         array_push($ClassData["roles"], strval($Role["id"]));
@@ -210,7 +245,7 @@
                             $ClassData["defaultRole"] = strval($Role["id"]);
                     }
                     
-                    $gGame["Classes"][strval($Class["id"])] = $ClassData;
+                    $Game["Classes"][strval($Class["id"])] = $ClassData;
                 }
                 
                 // Raidview
@@ -225,12 +260,12 @@
                         ? $MaxNumCols - $ColsUsed
                         : intval($Slot["columns"]);
                                         
-                    $gGame["RaidView"][strval($Slot["role"])] = $Columns;
+                    $Game["RaidView"][strval($Slot["role"])] = $Columns;
                     
                     if (isset($Slot["order"]))
                         array_push($Order, intval($Slot["order"]).":".strval($Slot["role"]));
                     else
-                        array_push($Order, sizeof($gGame["RaidViewOrder"]).":".strval($Slot["role"]));
+                        array_push($Order, count($Game["RaidViewOrder"]).":".strval($Slot["role"]));
                     
                     $ColsUsed += $Columns;
                 }
@@ -239,7 +274,7 @@
                 
                 foreach($Order as &$Role)
                 {
-                    array_push($gGame["RaidViewOrder"], substr($Role, strpos($Role, ":")+1));
+                    array_push($Game["RaidViewOrder"], substr($Role, strpos($Role, ":")+1));
                 }
                 
                 if ($ColsUsed != $MaxNumCols)
@@ -255,7 +290,7 @@
                     
                     foreach($Group->role as $Role)
                     {
-                        if (!isset($gGame["Roles"][strval($Role["id"])]))
+                        if (!isset($Game["Roles"][strval($Role["id"])]))
                             throw new Exception("Unknown role ".$Role["id"]." used in group (".$GroupSize.").");
                         
                         $Count = ($Role["count"] == "*")
@@ -269,7 +304,7 @@
                     if ($SlotsUsed != $GroupSize)
                         throw new Exception("Group size ".$GroupSize." contains ".$SlotsUsed." slots.");
                     
-                    $gGame["Groups"][$GroupSize] = $GroupData;
+                    $Game["Groups"][$GroupSize] = $GroupData;
                 }
             }
             catch(Exception $e)
@@ -277,23 +312,24 @@
                 $Out->pushError("Error parsing gameconfig file ".$ConfigFile.":\n\n".$e->getMessage());
             }
         }
+        
+        return $Game;
     }
-
+    
     // ---------------------------------------------------------------
 
-    function beginSession()
+    function loadGameSettings()
     {
-        ini_set("session.use_trans_sid",    0);
-        ini_set("session.use_cookies",      1);
-        ini_set("session.use_only_cookies", 1);
-        ini_set("session.cookie_httponly",  1);
-        ini_set("session.hash_function",    1);
-        ini_set("session.bug_compat_42",    0);
-
-        $SiteId = dechex(crc32(dirname(__FILE__)));
-
-        session_name("ppx_raidplaner_".$SiteId);
-        session_start();
+        global $gSite;
+        global $gGame;
+        
+        if ($gGame != null)
+            return; // ### return, already initialized ###
+            
+        loadSiteSettings();
+        $Out = Out::getInstance();
+        
+        $gGame = loadGame($gSite["GameConfig"]);
     }
 
     // ---------------------------------------------------------------
@@ -328,7 +364,7 @@
                                                    "Stage = 'locked'".
                                                    "WHERE Start < FROM_UNIXTIME(:Time) AND Stage = 'open'" );
 
-            $UpdateRaidQuery->bindValue(":Time", time() + $aSeconds, PDO::PARAM_INT);
+            $UpdateRaidQuery->bindValue(":Time", intval(time() + $aSeconds), PDO::PARAM_INT);
             $UpdateRaidQuery->execute();
         }
     }
@@ -343,7 +379,7 @@
                                            "WHERE ".RP_TABLE_PREFIX."Raid.End < FROM_UNIXTIME(:Time)" );
 
         $Timestamp = time() - $aSeconds;
-        $DropRaidQuery->bindValue( ":Time", $Timestamp, PDO::PARAM_INT );
+        $DropRaidQuery->bindValue( ":Time", intval($Timestamp), PDO::PARAM_INT );
         $DropRaidQuery->execute();
     }
 ?>

@@ -29,15 +29,22 @@
         $gLocale[ "Gladiator" ]                = "Gladiator";
         $gLocale[ "Lancer" ]                   = "Lancer";
         $gLocale[ "Marauder" ]                 = "Marauder";
-        $gLocale[ "Monk" ]                     = "Monk";
-        $gLocale[ "Paladin" ]                  = "Paladin";
+        $gLocale[ "Monk_FF14" ]                = "Monk";
+        $gLocale[ "Paladin_FF14" ]             = "Paladin";
         $gLocale[ "Pugilist" ]                 = "Pugilist";
         $gLocale[ "Scholar" ]                  = "Scholar";
         $gLocale[ "Summoner" ]                 = "Summoner";
         $gLocale[ "Theumaturge" ]              = "Theumaturge";
-        $gLocale[ "Warrior" ]                  = "Warrior";
+        $gLocale[ "Warrior_FF14" ]             = "Warrior";
         $gLocale[ "Whitemage" ]                = "Whitemage";
-        $gLocale[ "Random" ]                   = "Nieznana";
+        
+        // Classes Wildstar
+        $gLocale[ "Warrior_wstar" ]            = "Warrior";
+        $gLocale[ "Esper" ]                    = "Esper";
+        $gLocale[ "Spellslinger" ]             = "Spellslinger";
+        $gLocale[ "Stalker" ]                  = "Stalker";
+        $gLocale[ "Medic" ]                    = "Medic";
+        $gLocale[ "Engineer" ]                 = "Engineer";
 
         // Roles
         $gLocale[ "Tank" ]                     = "Tank";
@@ -49,7 +56,7 @@
 
         // Pre-loading checks
         $gLocale[ "ContinueNoUpdate" ]         = "Kontynuuj bez aktualizacji";
-        $gLocale[ "UpdateBrowser" ]            = "Zaktualizuj przeglądarkę";
+        $gLocale[ "UpdateBrowser" ]            = "Uaktualnij przeglądarkę";
         $gLocale[ "UsingOldBrowser" ]          = "Używasz nieaktualnej wersji przeglądarki.";
         $gLocale[ "OlderBrowserFeatures" ]     = "Nieaktualne przeglądarki mogą wyświetlać stronę niepoprawnie.";
         $gLocale[ "DownloadNewBrowser" ]       = "Uaktualnij swoją przeglądarkę lub zainstaluj jedną z poniższych.";
@@ -60,7 +67,7 @@
         $gLocale[ "Reserved" ]                 = "Rezerwacja";
         $gLocale[ "Error" ]                    = "Błąd";
         $gLocale[ "Apply" ]                    = "Zapisz zmiany";
-        $gLocale[ "AccessDenied" ]             = "Dostęp wzbroniony";
+        $gLocale[ "AccessDenied" ]             = "Brak dostępu";
         $gLocale[ "ForeignCharacter" ]         = "To nie jest twoja postać";
         $gLocale[ "DatabaseError" ]            = "Błąd bazy danych";
         $gLocale[ "Cancel" ]                   = "Anuluj";
@@ -70,10 +77,10 @@
         $gLocale[ "UnknownRequest" ]           = "Nieznane żądanie";
         $gLocale[ "InvalidRequest" ]           = "Niepoprawne żądanie";
         $gLocale[ "InputRequired" ]            = "Wymagane dodatkowe dane";
-        $gLocale[ "UnappliedChanges" ]         = "Czy chcesz pominąć wprowadzone zmiany?";
-        $gLocale[ "DiscardChanges" ]           = "Tak";
+        $gLocale[ "UnappliedChanges" ]         = "Czy chcesz wycofać wprowadzone zmiany?";
+        $gLocale[ "DiscardChanges" ]           = "Tak, wycofaj";
         $gLocale[ "to" ]                       = "do";
-        $gLocale[ "PHPVersionWarning" ]        = "Raidplaner od wersji 1.1.0 wymaga PHP w wersji 5.3 lub nowszej.<br/>Niestety twój serwer wymaga aktualizacji :(";
+        $gLocale[ "PHPVersionWarning" ]        = "Raidplaner od wersji 1.1.0 wymaga PHP w wersji 5.3.4 lub nowszej.<br/>Niestety twój serwer wymaga aktualizacji :(";
 
         // Login und user registration
         $gLocale[ "Login" ]                    = "Zaloguj";
@@ -158,13 +165,17 @@
         $gLocale[ "AbsentMessage" ]            = "Podaj powód dlaczego gracz będzie nieobecny.<br/>Wiadomość będzie poprzedzona twoim loginem.";
         $gLocale[ "SetupBy" ]                  = "Obecny";
         $gLocale[ "AbsentBy" ]                 = "Nieobecny";
-        $gLocale[ "SwitchChar" ]               = "Zmieniono postać";
+        $gLocale[ "SwitchChar" ]               = "Zmieniono rolę";
         $gLocale[ "RaidNotFound" ]             = "Nie znaleziono rajdu";
         $gLocale[ "RaidSetup" ]                = "Ustawienia rajdu";
         $gLocale[ "LinkToRaid" ]               = "Link do rajdu";
-        $gLocale[ "Switch" ]                   = "Przełącznik"; //????
-        $gLocale[ "Retire" ]                   = null;
-
+        $gLocale[ "Switch" ]                   = "Zmień rolę";
+        $gLocale[ "Retire" ]                   = "Nieobecny";
+        $gLocale[ "Export" ]                   = null;
+        $gLocale[ "ExportFile" ]               = null;
+        $gLocale[ "ExportClipboard" ]          = null;
+        $gLocale[ "CopyOk" ]                   = null;
+        
         // Profile
         $gLocale[ "Profile" ]                  = "Profil";
         $gLocale[ "History" ]                  = "Historia rajdów";
@@ -195,6 +206,7 @@
         $gLocale[ "NoEndDate" ]                = "Wprowadź ostatni dzień urlopu";
         $gLocale[ "VacationMessage" ]          = "Wiadomość urlopowa";
         $gLocale[ "ClearVacation" ]            = "Usuń dane o urlopie";
+        $gLocale[ "AutoAttend" ]               = null;
 
         // Settings
         $gLocale[ "Settings" ]                 = "Ustawienia";
@@ -231,11 +243,13 @@
         $gLocale[ "HelpPage" ]                 = "Link do pomocy";
         $gLocale[ "Game" ]                     = "Gra";
         $gLocale[ "Theme" ]                    = "Motyw";
+        $gLocale[ "ApiPrivate" ]               = "Token API (prywatny)";
         $gLocale[ "RaidSetupStyle" ]           = "Sposób zapisów";
         $gLocale[ "RaidModeManual" ]           = "Przez rajd lidera";
         $gLocale[ "RaidModeOverbook" ]         = "Przez raid lidera z nadmiarem";
         $gLocale[ "RaidModeAttend" ]           = "Automatyczny";
         $gLocale[ "RaidModeAll" ]              = "Tylko lista";
+        $gLocale[ "RaidModeOptOut" ]           = null;
         $gLocale[ "UpdateCheck" ]              = "Sprawdź aktualizacje";
         $gLocale[ "UpToDate" ]                 = "Raidplanner jest aktualny.";
         $gLocale[ "NewVersionAvailable" ]      = "Dostępna jest nowa wersja:";
@@ -272,13 +286,11 @@
         $gLocale[ "FTPClientHelp" ]            = "W celu uzykania informacji na temat zmiany uprawnień, sprawdź pliki pomocy twojego klienta FTP.";
         $gLocale[ "OutdatedPHP" ]              = "Nieaktualna wersja PHP";
         $gLocale[ "PHPVersion" ]               = "Wersja PHP";
-        $gLocale[ "McryptModule" ]             = "Moduł mcrypt";
-        $gLocale[ "McryptNotFound" ]           = "Mcrypt nie został skonfigurowany z PHP";
         $gLocale[ "PDOModule" ]                = "Moduł PDO";
         $gLocale[ "PDONotFound" ]              = "PDO nie został skonfigurowany z PHP";
         $gLocale[ "PDOMySQLModule" ]           = "Sterownik PDO MySQL";
         $gLocale[ "PDOMySQLNotFound" ]         = "Sterownik PDO MySQL nie został odnaleziony";
-        $gLocale[ "PHPRequirements" ]          = "Raidplanner wymaga zainstalowanego PHP 5.2 z modułami mcrypt i PDO.";
+        $gLocale[ "PHPRequirements" ]          = "Raidplanner wymaga zainstalowanego PHP 5.4 z modułami PDO.";
 
         // Database setup
         $gLocale[ "ConfigureDatabase" ]        = "Skonfiguruj bazę danych z której korzystać będzie raidplanner.";
@@ -295,9 +307,9 @@
         $gLocale[ "ConnectionTestOk" ]         = "Test połączenia zakończony sukcesem";
 
         // Registration and admin
-        $gLocale[ "AdminName" ]                = null;
+        $gLocale[ "AdminName" ]                = "Nazwa administratora";
         $gLocale[ "AdminPassword" ]            = "Hasło administratora";
-        $gLocale[ "AdminPasswordSetup"]        = "Administrator (nazwa użytkownika \"admin\") jest użytkownikiem posiadającym zawsze wszystkie uprawnienia.";
+        $gLocale[ "AdminPasswordSetup"]        = "Administrator jest użytkownikiem posiadającym zawsze wszystkie uprawnienia.";
         $gLocale[ "AdminNotMoveable"]          = "Nazwa konta administratora nie może być zmieniona, a konto nie może zostać przypisane do innej grupy.";
         $gLocale[ "AdminPasswordNoMatch" ]     = "Hasło administratora zostało powtórzone niepoprawnie.";
         $gLocale[ "AdminPasswordEmpty" ]       = "Hasło administratora nie może być puste.";
@@ -309,7 +321,7 @@
         $gLocale[ "UseClearText" ]             = "Wysyłaj niezakodowane hasła (nie zalecane)";
 
         // Install/Update
-        $gLocale[ "SecurityWarning" ]          = null;
+        $gLocale[ "SecurityWarning" ]          = "Ostrzeżenie bezpieczeństwa";
         $gLocale[ "UpdateComplete" ]           = "Aktualizacja zakończona";
         $gLocale[ "RaidplanerSetupDone" ]      = "Raidplanner został poprawnie skonfigurowany.";
         $gLocale[ "DeleteSetupFolder" ]        = "Zalecane jest usunięcie katalogu \"setup\" i zabezpieczenie następujących katalogów (np. przez htaccess):";
@@ -327,20 +339,18 @@
         $gLocale[ "UpdateErrors" ]             = "Błędy aktualizacji";
         $gLocale[ "ReportedErrors" ]           = "Poniższe błędy wystąpiły podczas próby aktualizacji.";
         $gLocale[ "PartiallyUpdated" ]         = "Może to świadczyć o częściowo zaktualizowanej bazie danych.";
-        $gLocale[ "GameconfigNotFound" ]       = null;
-        $gLocale[ "FailedGameconfig" ]         = null;
-        $gLocale[ "RemoveAndLaunch" ]          = null;
-        $gLocale[ "FailedRemoveSetup" ]        = null;
+        $gLocale[ "GameconfigNotFound" ]       = "Plik gameconfig.php nie został znaleziony.";
+        $gLocale[ "FailedGameconfig" ]         = "Plik gameconfig.php nie może być zaktualizowany do nowego formatu.";
+        $gLocale[ "RemoveAndLaunch" ]          = "Usuń instalator i przejdź do strony głownej.";
+        $gLocale[ "FailedRemoveSetup" ]        = "Katalgog instalacyjny nie może być usunięty.";
 
         // Repair
-        $gLocale[ "Repair" ]                   = "Napraw niespójną bazę danych";
-        $gLocale[ "GameconfigProblems" ]       = "Zmiany w pliku lib/config/config.game.php mogą wywołać niespójność bazy danych (np. postacie z nieprawidłowym przypisaniem ról).";
-        $gLocale[ "RepairTheseProblems" ]      = "Ten skrypt postara się naprawić te błędy w jak największym stopniu.";
+        $gLocale[ "Repair" ]                   = "Napraw";
         $gLocale[ "RepairDone" ]               = "Naprawa zakończona.";
         $gLocale[ "BrokenDatabase" ]           = "Baza danych wygląda na nienaprawialną";
         $gLocale[ "EnsureValidDatabase" ]      = "Upewnij się czy baza danych jest poprawna";
-        $gLocale[ "ItemsRepaired" ]            = "naprawionych elementów";
-        $gLocale[ "ItemsToResolve" ]           = "elementów, które muszą zostać poprawione ręcznie";
+        $gLocale[ "ItemsRepaired" ]            = "Naprawione elementy";
+        $gLocale[ "ItemsToResolve" ]           = "Elementy, które muszą zostać poprawione ręcznie";
         $gLocale[ "InvalidCharacters" ]        = "Nieprawidłowe postacie";
         $gLocale[ "InvalidAttendances" ]       = "Nieprawidłowe zapisy";
         $gLocale[ "Delete" ]                   = "Usuń";
@@ -349,6 +359,20 @@
         $gLocale[ "StrayCharacters" ]          = "Usunięte postacie";
         $gLocale[ "StrayUsers" ]               = "Usunięci użytkownicy";
         $gLocale[ "StrayBindings" ]            = "Nieprawidłowe powiązania";
+        $gLocale[ "RepairCharacters" ]         = "Napraw niepoprawne postacie";
+        $gLocale[ "TransferGameconfig" ]       = "Aktualizuj gameconfig.php (Raidplaner 1.0.x)";
+        $gLocale[ "MergeGames" ]               = "Połącz dwie gry";
+        $gLocale[ "SourceGame" ]               = "Źródło";
+        $gLocale[ "TargetGame" ]               = "Cel";
+        $gLocale[ "ChooseRepairs" ]            = "Wybież akcje, które zostaną wykonane.";
+        $gLocale[ "Fixing" ]                   = "Naprawianie";
+        $gLocale[ "StrayChars" ]               = "Osierocone postacie";
+        $gLocale[ "StrayAttends" ]             = "Osierocone zapisy";
+        $gLocale[ "InvalidCharacters" ]        = "Nieprawidłowe postacie";
+        $gLocale[ "SameGame" ]                 = "Gry są identyczne";   
+        $gLocale[ "Merged" ]                   = "Zaktualizowano:"; 
+        $gLocale[ "Locations" ]                = "Lokacje"; 
+        $gLocale[ "Characters" ]               = "Postacie"; 
 
         // Plugin setup
         $gLocale[ "LoadGroups" ]               = "Wczytaj grupy używając powyższych ustawień";

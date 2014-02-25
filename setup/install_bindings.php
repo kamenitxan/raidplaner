@@ -9,7 +9,7 @@
 
     $gBindings = array();
 
-    PluginRegistry::ForEachPlugin( function($PluginInstance) use (&$gBindings)
+    PluginRegistry::ForEachBinding( function($PluginInstance) use (&$gBindings)
     {
         array_push($gBindings, $PluginInstance);
     });
@@ -167,7 +167,7 @@
             echo "</select><br/><br/>";
 
             $Users = $Binding->getUsersFromConfig();
-            $FoundUsers = ($Users != null) && (sizeof($Users) > 0);
+            $FoundUsers = ($Users != null) && (count($Users) > 0);
 
             echo L("PostAsUser")."<br/>";
             echo "<select id=\"".$Binding->getName()."_postas\"".$Disabled.">";

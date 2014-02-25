@@ -21,10 +21,10 @@
 
     // Version check
 
-    echo "<br/><span class=\"check_field\">".L("PHPVersion")." (>= 5.3.0)</span>";
+    echo "<br/><span class=\"check_field\">".L("PHPVersion")." (>= 5.3.4)</span>";
     $TestsFailed = 0;
 
-    if ( PHP_VERSION_ID >= 50300 )
+    if ( PHP_VERSION_ID >= 50304 )
     {
         echo "<span class=\"check_result\" style=\"color: green\">".L("Ok");
     }
@@ -73,19 +73,6 @@
         echo "<span class=\"check_result\" style=\"color: red\">".L("PDOMySQLNotFound")."</span>";
     }
 
-    // MCrypt module check
-
-    echo "<br/><span class=\"check_field\">".L("McryptModule")."</span>";
-    if ( in_array("mcrypt", $Extensions) )
-    {
-        echo "<span class=\"check_result\" style=\"color: green\">".L("Ok")."</span>";
-    }
-    else
-    {
-        ++$TestsFailed;
-        echo "<span class=\"check_result\" style=\"color: red\">".L("McryptNotFound")."</span>";
-    }
-
     // Config folder check
 
     echo "<br/><br/><span class=\"check_field\">".L("ConfigFolder")."</span>";
@@ -120,7 +107,7 @@
 
     // Plugin config files check
 
-    PluginRegistry::ForEachPlugin(function($PluginInstance) use (&$TestsFailed)
+    PluginRegistry::ForEachBinding(function($PluginInstance) use (&$TestsFailed)
     {
         $Binding = $PluginInstance->getName();
 

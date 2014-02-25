@@ -44,13 +44,14 @@
         global $gLocale;
         $EncodedLocale = array();
 
-        while ( list( $Key, $Value) = each($gLocale) )
+        foreach ( $gLocale as $Key => $Value )
         {
             if ($Value != null)
             {
                 $Flags = (PHP_VERSION_ID >= 50400) ? ENT_COMPAT | ENT_XHTML : ENT_COMPAT;
-
-                $Encoded = htmlentities($Value, $Flags, 'UTF-8');
+                $Flags = (PHP_VERSION_ID >= 50300) ? $Flags | ENT_IGNORE : $Flags;
+                
+                $Encoded = htmlentities(getUTF8($Value), $Flags, 'UTF-8');
                 $EncodedLocale[$Key] = $Encoded;
             }
         }

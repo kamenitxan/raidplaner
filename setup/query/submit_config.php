@@ -1,8 +1,7 @@
 <?php
     header("Content-type: text/xml");
     echo "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n";
-    echo "<database>";
-
+    
     define( "LOCALE_SETUP", true );
     require_once("../../lib/private/connector.class.php");
     require_once("tools_install.php");
@@ -31,12 +30,10 @@
 
     // Create tables if necessary
 
-    InstallDB($_REQUEST["prefix"]);
+    InstallDB(RP_TABLE_PREFIX);
 
     // Add default values for settings table
 
-    InstallDefaultSettings($_REQUEST["prefix"]);
-    $Out->flushXML("");
-
-    echo "</database>";
+    InstallDefaultSettings(RP_TABLE_PREFIX);    
+    $Out->flushXML("database");
 ?>
